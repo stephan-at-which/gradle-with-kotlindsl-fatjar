@@ -2,6 +2,12 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
     kotlin("jvm") version "1.3.21"
+    application
+    id("com.github.johnrengelman.shadow") version "5.0.0"
+}
+
+application {
+    mainClassName = "uk.co.which.stephan.server.ServerKt"
 }
 
 group = "uk.co.which.stephan"
@@ -24,20 +30,11 @@ tasks {
         kotlinOptions.jvmTarget = "1.8"
     }
 
-    jar {
-        manifest {
-            attributes("Main-Class" to "uk.co.which.stephan.server.ServerKt")
-        }
+    shadowJar {
+        // defaults to project.name
+        //archiveBaseName.set("${project.name}-fat")
 
-        from({
-            val compileConfig = configurations.compile.get()
-            logger.info("#files to iterate over: ${compileConfig.count()}")
-            compileConfig.map { file ->
-                {
-                    logger.info("compileConfig.file: ${file.canonicalPath}")
-                    if (file.isDirectory) file else zipTree(file)
-                }
-            }
-        })
+        // defaults to all, so removing this overrides the normal, non-fat jar
+        archiveClassifier.set("")
     }
 }
